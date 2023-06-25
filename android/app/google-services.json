@@ -1,0 +1,46 @@
+{
+  "project_info": {
+    "project_number": "690169757264",
+    "project_id": "elancer-chat-app-2a0ec",
+    "storage_bucket": "elancer-chat-app-2a0ec.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:690169757264:android:5c154d787470ce6b439b55",
+        "android_client_info": {
+          "package_name": "com.app.chat.elancer_chat_app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "690169757264-7bl3l45nasn8cqifsjg40kuqk5ba4dbb.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD8XvkdIDGYmnSeGL2plgkplbqX3qOgVh8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "690169757264-7bl3l45nasn8cqifsjg40kuqk5ba4dbb.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "690169757264-bpmeh7k4hf7bkjbas1q13rai03kl9ebt.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.app.chat.elancerChatApp"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
