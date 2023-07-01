@@ -19,7 +19,7 @@ class _ChatScreenState extends State<ChatsScreen> {
   @override
   Widget build(BuildContext context) {
     return StreamBuilder< List<Chat> /*QuerySnapshot<Chat>*/>(
-        stream: FireStoreChatController().getChats(),
+        stream: FireStoreChatController().getChats1(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());

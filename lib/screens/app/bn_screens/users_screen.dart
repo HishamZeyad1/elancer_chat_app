@@ -128,35 +128,40 @@ class _UserScreenState extends State<UsersScreen> {
                     ),
                   ),
                   onTap: ()async{
-                    await _navigateToChatScreen(snapshot.data!.docs[index].id,snapshot, index, context);
+                    print("Chat with UserUid:${snapshot.data!.docs[index].data().id} and UserName:${snapshot.data!.docs[index].data().name} ");
+                    await _navigateToChatScreen(snapshot, index, context);
                   },
                 );
               },
               itemCount: snapshot.data!.docs.length,
             );
           } else {
-            return Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(
-                  Icons.warning,
-                  size: 85.w,
-                  color: Colors.grey,
-                ),
-                Text(
-                  "No Users",
-                  style: GoogleFonts.acme(
-                      fontWeight: FontWeight.bold,
-                      color: Colors.grey,
-                      fontSize: 26.sp),
-                )
-              ],
+            return Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    Icons.warning,
+                    size: 85.w,
+                    color: Colors.grey,
+                  ),
+                  Text(
+                    "No Users",
+                    style: GoogleFonts.acme(
+                        fontWeight: FontWeight.bold,
+                        color: Colors.grey,
+                        fontSize: 26.sp),
+                  )
+                ],
+              ),
             );
           }
         });
   }
 
-  Future<void> _navigateToChatScreen(String documentId,AsyncSnapshot<QuerySnapshot<ChatUser>> snapshot, int index, BuildContext context) async {
+  Future<void> _navigateToChatScreen(AsyncSnapshot<QuerySnapshot<ChatUser>> snapshot, int index, BuildContext context) async {
+    print("Chat with UserUid:${snapshot.data!.docs[index].data().id} and UserName:${snapshot.data!.docs[index].data().name} ");
+
     ProcessResponse<Chat> processResponse=await FireStoreChatController().checkChat(peerUid: snapshot.data!.docs[index].data().id);
    print(processResponse.object!.peer1Uid);
     print(processResponse.object!.peer2Uid);
