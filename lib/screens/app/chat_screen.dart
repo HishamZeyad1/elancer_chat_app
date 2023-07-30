@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -9,6 +10,7 @@ import 'package:elancer_chat_app/models/chat_user.dart';
 import 'package:elancer_chat_app/models/message.dart';
 import 'package:elancer_chat_app/widgets/message_item.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
@@ -22,34 +24,57 @@ class ChatScreen extends StatefulWidget {
   State<ChatScreen> createState() => _ChatScreenState();
 }
 
-class _ChatScreenState extends State<ChatScreen> {
+class _ChatScreenState extends State<ChatScreen>{
   late TextEditingController _messageTextController;
-  late ScrollController _scrollController;
+  // late ScrollController _scrollController;
+  final ScrollController _scrollController = ScrollController();
+
   XFile? _pickedImageFile;
   late ImagePicker _imagePicker;
   late Message _newMessage;
+  Stream<QuerySnapshot<Message>>? _messageQSnapshot;
+  StreamSubscription<QuerySnapshot<Message>>? _streamSubscription;
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
     _messageTextController = TextEditingController();
-    _scrollController = ScrollController();
-    // if(_scrollController.hasClients)
-    //   _scrollController.position.moveTo();
 
+    _messageQSnapshot=FireStoreMessageController().readMessages(chatId: widget.chat.id);
+    _streamSubscription=FireStoreMessageController().readMessages(chatId: widget.chat.id).listen((event) {
+        // if(event.docs.length!=0){
+          print("${event.docs.length!=0}:len:${event.docs.length}");
+          scrollToLastMessage();
+        // }
+      // _messageQSnapshot=event;
+    });
     _imagePicker = ImagePicker();
+  }
+
+
+  // Method to scroll to the last message
+  void scrollToLastMessage() {
+    print("Scrolling");
+    WidgetsBinding.instance?.addPostFrameCallback((_) {
+      if (_scrollController.hasClients) {
+        _scrollController.jumpTo(_scrollController.position.maxScrollExtent);
+      }
+    });
   }
 
   @override
   void dispose() {
-    // TODO: implement dispose
+    // WidgetsBinding.instance!.removeObserver(this);
+    _streamSubscription!.cancel();
+    _scrollController.dispose();
     _messageTextController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+
     return Scaffold(
         backgroundColor: Colors.white,
         appBar: AppBar(
@@ -136,8 +161,8 @@ class _ChatScreenState extends State<ChatScreen> {
         body: Column(
           children: [
             StreamBuilder<QuerySnapshot<Message>>(
-                stream: FireStoreMessageController()
-                    .readMessages(chatId: widget.chat.id),
+                stream:_messageQSnapshot /*FireStoreMessageController()
+                    .readMessages(chatId: widget.chat.id)*/,
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return const Center(child: CircularProgressIndicator());
@@ -145,50 +170,48 @@ class _ChatScreenState extends State<ChatScreen> {
                   else if (snapshot.hasData &&
                       snapshot.data!.docs.isNotEmpty){
                     return Expanded(
-                      child: SingleChildScrollView(
+                      child: ListView(
                         controller: _scrollController,
                         // reverse: true,
                         physics: BouncingScrollPhysics(),
-                        child: Expanded(
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: snapshot.data!.docs
-                                .where((element) => !element.data().isDeletedForMe)
-                                .map(
-                              (e) {
-                                return Align(
-                                  alignment: e.data().isSender
-                                      ? AlignmentDirectional.centerEnd
-                                      : AlignmentDirectional.centerStart,
-                                  child: Container(
-                                    decoration: BoxDecoration(
-                                      color: e.data().isSender
-                                          ? Colors.pink.shade200
-                                          : Colors.blue.shade200,
-                                      borderRadius: BorderRadius.circular(10),
-                                    ),
-                                    padding: EdgeInsets.symmetric(
-                                        horizontal: 20.w, vertical: 10.h),
-                                    margin: EdgeInsetsDirectional.only(
-                                      bottom: 10.h,
-                                      start: !e.data().isSender ? 10.w : 50.w,
-                                      end: e.data().isSender ? 10.w : 50.w,
-                                    ),
-                                    child: MessageItem(
-                                        message: e.data(),
-                                        onLongPress: () async => !e.data().deletedForEveryOne?await _showMessageOptionsDialog(documentSnapshot: e):null,
-                                          // {
-                                          // print("dddd");
-                                          // await _showMessageOptionsDialog(documentSnapshot: e);
-                                        // }
-                                        ),
+                        children: [Column(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: snapshot.data!.docs
+                              .where((element) => !element.data().isDeletedForMe)
+                              .map(
+                            (e) {
+                              return Align(
+                                alignment: e.data().isSender
+                                    ? AlignmentDirectional.centerEnd
+                                    : AlignmentDirectional.centerStart,
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    color: e.data().isSender
+                                        ? Colors.pink.shade200
+                                        : Colors.blue.shade200,
+                                    borderRadius: BorderRadius.circular(10),
                                   ),
-                                );
-                              },
-                            ).toList(),
-                          ),
-                        ),
+                                  padding: EdgeInsets.symmetric(
+                                      horizontal: 20.w, vertical: 10.h),
+                                  margin: EdgeInsetsDirectional.only(
+                                    bottom: 10.h,
+                                    start: !e.data().isSender ? 10.w : 50.w,
+                                    end: e.data().isSender ? 10.w : 50.w,
+                                  ),
+                                  child: MessageItem(
+                                      message: e.data(),
+                                      onLongPress: () async => !e.data().deletedForEveryOne?await _showMessageOptionsDialog(documentSnapshot: e):null,
+                                        // {
+                                        // print("dddd");
+                                        // await _showMessageOptionsDialog(documentSnapshot: e);
+                                      // }
+                                      ),
+                                ),
+                              );
+                            },
+                          ).toList(),
+                        ),]
                       ),
                     );
                   }
@@ -303,17 +326,31 @@ class _ChatScreenState extends State<ChatScreen> {
       //   //     message: _messageTextController.text.toString(), isSender: true));
       // });
       _clear();
-     if(_scrollController.hasClients)
-      Future.delayed(
-        Duration(milliseconds: 100),
-        () {
-          _scrollController.animateTo(
-              _scrollController.position.maxScrollExtent,
-              duration: Duration(milliseconds: 500),
-              curve: Curves.easeIn);
-        },
-      );
+      if(_scrollController.hasClients)
+        Future.delayed(
+          Duration(milliseconds: 100),
+              () {
+            _scrollController.animateTo(
+                _scrollController.position.maxScrollExtent,
+                duration: Duration(milliseconds: 500),
+                curve: Curves.easeIn);
+          },
+        );
+      // _scrollToBottom();
+
     }
+  }
+
+  void _scrollToBottom() {
+    SchedulerBinding.instance!.addPostFrameCallback((_) {
+      if (_scrollController.hasClients) {
+        _scrollController.animateTo(
+          _scrollController.position.maxScrollExtent,
+          duration: Duration(milliseconds: 300),
+          curve: Curves.easeInOut,
+        );
+      }
+    });
   }
 
   void getMessage() {

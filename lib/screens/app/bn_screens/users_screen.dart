@@ -94,23 +94,12 @@ class _UserScreenState extends State<UsersScreen> {
                                   child: Text("Block"),
                                   height: 25.h,
                                   value: 2,
-                                  onTap: () {},
+                                  onTap: () async{
+                                    await FirestoreUserController().blockUser(
+                                        blockUserId:
+                                        snapshot.data!.docs[index].data().id);
+                                  },
                                 ),
-                                // PopupMenuDivider(),
-                                // PopupMenuItem(
-                                //   child: Text("data 3"),
-                                //   height: 25.h,
-                                //
-                                //   value: 3,
-                                //   onTap: () {},
-                                // ),
-                                // PopupMenuDivider(),
-                                // PopupMenuItem(
-                                //   child: Text("data 4"),
-                                //   height: 25.h,
-                                //   value: 4,
-                                //   onTap: () {},
-                                // ),
                               ];
                             },
                             elevation: 5,

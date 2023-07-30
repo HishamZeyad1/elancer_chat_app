@@ -58,28 +58,28 @@ Future<ChatUser> getUserByPath({required String path}) async {
     return chatUserDocument.docs[0].data();
   }
 
-// Future<bool> blockUser({required String blockUserId}) async {
-//   QueryDocumentSnapshot<ChatUser> queryDocumentSnapshot =
-//       await getMyAccount();
-//   ChatUser chatUser = queryDocumentSnapshot.data();
-//   chatUser.blockedUsers.add(blockUserId);
-//   return await queryDocumentSnapshot.reference
-//       .update({'blocked_users': chatUser.blockedUsers})
-//       .then((value) => true)
-//       .catchError((error) => false);
-// }
-//
-// Future<QueryDocumentSnapshot<ChatUser>> getMyAccount() async {
-//   QuerySnapshot<ChatUser> querySnapshot = await _firebaseFirestore
-//       .collection('Users')
-//       .where('id', isEqualTo: FbAuthController().user.uid)
-//       .limit(1)
-//       .withConverter<ChatUser>(
-//           fromFirestore: (snapshot, options) =>
-//               ChatUser.fromMap(snapshot.data()!),
-//           toFirestore: (ChatUser chatUser, options) => chatUser.toMap())
-//       .get();
-//
-//   return querySnapshot.docs.first;
-// }
+Future<bool> blockUser({required String blockUserId}) async {
+  QueryDocumentSnapshot<ChatUser> queryDocumentSnapshot =
+      await getMyAccount();
+  ChatUser chatUser = queryDocumentSnapshot.data();
+  chatUser.blockedUsers.add(blockUserId);
+  return await queryDocumentSnapshot.reference
+      .update({'blocked_users': chatUser.blockedUsers})
+      .then((value) => true)
+      .catchError((error) => false);
+}
+
+Future<QueryDocumentSnapshot<ChatUser>> getMyAccount() async {
+  QuerySnapshot<ChatUser> querySnapshot = await _firebaseFirestore
+      .collection('Users')
+      .where('id', isEqualTo: FbAuthController().user.uid)
+      .limit(1)
+      .withConverter<ChatUser>(
+          fromFirestore: (snapshot, options) =>
+              ChatUser.fromMap(snapshot.data()!),
+          toFirestore: (ChatUser chatUser, options) => chatUser.toMap())
+      .get();
+
+  return querySnapshot.docs.first;
+}
 }
