@@ -1,5 +1,9 @@
 include ':app'
 
+// Add the following lines for awn_core
+//include ':awn_core'
+//project(':awn_core').projectDir = new File(rootProject.projectDir, '../flutter_awesome_notifications/awn_core')
+
 def localPropertiesFile = new File(rootProject.projectDir, "local.properties")
 def properties = new Properties()
 

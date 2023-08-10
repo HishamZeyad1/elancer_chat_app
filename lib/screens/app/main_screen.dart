@@ -1,8 +1,12 @@
+import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:elancer_chat_app/models/bn_screen.dart';
 import 'package:elancer_chat_app/screens/app/bn_screens/chats_screen.dart';
 import 'package:elancer_chat_app/screens/app/bn_screens/setting.dart';
 import 'package:elancer_chat_app/screens/app/bn_screens/stories_screen.dart';
 import 'package:elancer_chat_app/screens/app/bn_screens/users_screen.dart';
+import 'package:elancer_chat_app/utils/fb_notifications.dart';
+
+// import 'package:elancer_chat_app/utils/fb_notifications.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -15,14 +19,25 @@ class MainScreen extends StatefulWidget {
   State<MainScreen> createState() => _MainScreenState();
 }
 
-class _MainScreenState extends State<MainScreen> {
+class _MainScreenState extends State<MainScreen> with FbNotifications {
   int _selectedIndex = 0;
-  List<BnScreen> bnScreens=[
+  List<BnScreen> bnScreens = [
     BnScreen(title: "Chats", widget: ChatsScreen()),
     BnScreen(title: "Users", widget: UsersScreen()),
     BnScreen(title: "Stories", widget: StoriesScreen()),
     BnScreen(title: "Setting", widget: Setting()),
   ];
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    // AwesomeNotifications().requestPermissionToSendNotifications();
+    requestNotificationPermissions();
+    initializeForegroundNotificationForAndroid();
+    // configureFCM(context: context);
+    // manageNotificationAction();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -41,7 +56,7 @@ class _MainScreenState extends State<MainScreen> {
           ),
         ),
       ),
-      body:bnScreens[_selectedIndex].widget,
+      body: bnScreens[_selectedIndex].widget,
 
       // Center(
       //   child: Text(
@@ -63,13 +78,15 @@ class _MainScreenState extends State<MainScreen> {
               activeIcon: Icon(Icons.person),
               label: "users"),
           BottomNavigationBarItem(
-              icon: Icon(Icons.motion_photos_on),activeIcon: Icon(Icons.motion_photos_on_sharp), label: "stories"),
+              icon: Icon(Icons.motion_photos_on),
+              activeIcon: Icon(Icons.motion_photos_on_sharp),
+              label: "stories"),
           BottomNavigationBarItem(
               icon: Icon(Icons.settings_outlined),
               activeIcon: Icon(Icons.settings),
               label: "setting"),
         ],
-        type:BottomNavigationBarType.fixed ,
+        type: BottomNavigationBarType.fixed,
         elevation: 8,
         currentIndex: _selectedIndex,
         onTap: (value) {

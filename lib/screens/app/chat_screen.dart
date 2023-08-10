@@ -15,6 +15,8 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
 
+import '../../utils/fb_notifications.dart';
+
 class ChatScreen extends StatefulWidget {
   final Chat chat;
 
@@ -24,9 +26,8 @@ class ChatScreen extends StatefulWidget {
   State<ChatScreen> createState() => _ChatScreenState();
 }
 
-class _ChatScreenState extends State<ChatScreen>{
+class _ChatScreenState extends State<ChatScreen> with FbNotifications{
   late TextEditingController _messageTextController;
-  // late ScrollController _scrollController;
   final ScrollController _scrollController = ScrollController();
 
   XFile? _pickedImageFile;
@@ -137,6 +138,7 @@ class _ChatScreenState extends State<ChatScreen>{
                             style:
                                 GoogleFonts.acme(fontWeight: FontWeight.normal),
                           ),
+                          
                         ],
                       ),
                       value: 1,
@@ -156,6 +158,10 @@ class _ChatScreenState extends State<ChatScreen>{
                 },
               ),
             ),
+            IconButton(onPressed: ()async{
+              await sendNotify("title", "body", "1");
+
+            }, icon: Icon(Icons.add_call)),
           ],
         ),
         body: Column(
